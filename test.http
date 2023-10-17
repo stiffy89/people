@@ -1,0 +1,2 @@
+GET http://dest_ecc.dest/sap/opu/odata/SAP/Z_CRUD_TST_SRV/$metadata
+
