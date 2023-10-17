@@ -1,2 +1,46 @@
 GET http://dest_ecc.dest/sap/opu/odata/SAP/Z_CRUD_TST_SRV/$metadata
 
+###
+GET http://dest_ecc.dest/sap/opu/odata/SAP/Z_CRUD_TST_SRV/People?$format=json
+Content-Type: application/json
+
+###
+GET http://dest_ecc.dest/sap/opu/odata/SAP/Z_CRUD_TST_SRV/People('004')?$format=json
+Content-Type: application/json
+X-CSRF-Token: fetch
+
+
+###
+PUT http://dest_ecc.dest/sap/opu/odata/SAP/Z_CRUD_TST_SRV/People('004')
+Content-Type: application/json
+X-CSRF-Token: TQynCr9kISjM6-J033mtiw==
+
+{
+    "PersonId": "004",
+    "FirstName": "John",
+    "LastName": "Smith",
+    "StartDate": "\/Date(1675641600000)\/",
+    "EndDate": "\/Date(1682380800000)\/",
+    "HeightCm": 179,
+    "ImageBase64": ""
+}
+
+###
+POST http://dest_ecc.dest/sap/opu/odata/SAP/Z_CRUD_TST_SRV/People
+Content-Type: application/json
+X-CSRF-Token: TQynCr9kISjM6-J033mtiw==
+
+{
+    "PersonId": "",
+    "FirstName": "Sam",
+    "LastName": "Smith",
+    "StartDate": "\/Date(1675641600000)\/",
+    "EndDate": "\/Date(1682380800000)\/",
+    "HeightCm": 150,
+    "ImageBase64": ""
+}
+
+###
+DELETE http://dest_ecc.dest/sap/opu/odata/SAP/Z_CRUD_TST_SRV/People('010')
+Content-Type: application/json
+X-CSRF-Token: TQynCr9kISjM6-J033mtiw==
