@@ -6,6 +6,7 @@
   },
   "devDependencies": {
     "@cap-js/sqlite": "^1",
+    "@sap/cds-dk": "^7",
     "@sap/ux-specification": "^1.108.16"
   },
   "scripts": {
@@ -14,20 +15,20 @@
   },
   "cds": {
     "requires": {
-        "z_crud_tst_srv": {
-            "kind": "odata-v2",
-            "model": "srv/external/z_crud_tst_srv",
-            "csrf": true,
-            "csrfInBatch": true,
-            "[devdestination]": {
-                "credentials": {
-                    "destination": "dest_ecc"
-                }
-            }
-        },
-        "[production]": {
-            "auth": "xsuaa"
+      "z_crud_tst_srv": {
+        "kind": "odata-v2",
+        "model": "srv/external/z_crud_tst_srv",
+        "csrf": true,
+        "csrfInBatch": true,
+        "[devdestination]": {
+          "credentials": {
+            "destination": "dest_ecc"
+          }
         }
+      },
+      "[production]": {
+        "auth": "xsuaa"
+      }
     }
   },
   "sapux": [
