@@ -5,7 +5,8 @@
     "express": "^4"
   },
   "devDependencies": {
-    "@cap-js/sqlite": "^1"
+    "@cap-js/sqlite": "^1",
+    "@sap/ux-specification": "^1.108.16"
   },
   "scripts": {
     "watch-peopleapp": "cds watch --open peopleapp/webapp/index.html?sap-ui-xx-viewCache=false"
