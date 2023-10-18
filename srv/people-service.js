@@ -4,46 +4,142 @@ module.exports = cds.service.impl(async function () {
 
 	const testservice = await cds.connect.to('z_crud_tst_srv');
 
-	let { People } = this.entities;
+	let { PeopleSet } = this.entities;
 
 	let srv = this;
+    
+	async function readDestination (sUrl) {
+		return await testservice.send({
+			method: 'GET',
+			path: sUrl
+		});
+	}
 
-    //filters out all the additional columns that CAP implements that is not apart of our destination
-    function RequestSanitizer(req) {
-        if (req.query.SELECT) {
-			if (!req.query.SELECT.columns) {
-				req.query.SELECT.columns = [];
-				for (const el in req.target.elements) {
-					req.query.SELECT.columns.push({ ref: [el] });
+	async function updateDestination (sUrl, data) {
+		return await testservice.send({
+			method: 'PUT',
+			path: sUrl,
+			data: data
+		})
+	}
+
+	async function createDestination (data) {
+		return await testservice.send({
+			method: 'POST',
+			path: "/sap/opu/odata/sap/z_crud_tst_srv/People",
+			data: data
+		})
+	}
+
+	function dateConverter (jsonDate, bBack){
+		if (!bBack){
+			const content = /\d+/.exec(String(jsonDate));
+			const timestamp = content ? Number(content[0]) : 0;
+			const date = new Date(timestamp);
+			return date;
+		} else {
+			let iTimeStamp = Date.parse(new Date(jsonDate));
+			return "\/Date(" + iTimeStamp.toString() + ")\/";
+		}
+	}
+
+	this.after('EDIT', 'PeopleSet', async(data) => {
+		//check to see if we have the existing record in persistence, if not, create it
+		const existingRecord = await SELECT.from(PeopleSet).where({PersonId : data.PersonId});
+
+		if (existingRecord.length == 0){
+			let aFilteredItems = [
+			"IsActiveEntity",
+			"SiblingEntity",
+			"DraftAdministrativeData_DraftUUID",
+			"DraftAdministrativeData",
+			"HasDraftEntity",
+			"HasActiveEntity",
+			"uuid"];
+	
+			let aKeys = Object.keys(data);
+			let oNewObj = {};
+			for (var i in aKeys){
+				if (!aFilteredItems.includes(aKeys[i])){
+					oNewObj[aKeys[i]] = data[aKeys[i]]
 				}
 			}
+	
+			await srv.create(PeopleSet).entries(oNewObj);
+		}
+	});
+
+	this.on('UPDATE', 'PeopleSet', async (req, next) => {
+		let data = req.data;
+		const startDate = dateConverter(data.StartDate, true);
+		const endDate = dateConverter(data.EndDate, true);
+		let oNewObj = {
+			FirstName: data.FirstName,
+			LastName: data.LastName,
+			PersonId: data.PersonId,
+			HeightCm: data.HeightCm,
+			ImageBase64: data.ImageBase64,
+			StartDate: startDate,
+			EndDate: endDate
 		}
 
-		req.query.SELECT.columns = req.query.SELECT.columns.filter((c) =>
-			!([
-				"IsActiveEntity",
-				"SiblingEntity",
-				"DraftAdministrativeData_DraftUUID",
-				"DraftAdministrativeData",
-				"HasDraftEntity",
-				"HasActiveEntity",
-				"uuid"
-			].includes(c.ref?.[0]))
-		);
+		const sUrl = "/sap/opu/odata/sap/z_crud_tst_srv/People('" + data.PersonId + "')"
+		const result = await updateDestination(sUrl, oNewObj);
+		return next();
+	});
 
-		if (req.query.SELECT.orderBy) {
-			req.query.SELECT.orderBy = req.query.SELECT.orderBy.filter((x) => !([
-				"uuid"
-			]).includes(x.ref?.[0]));
+	this.after('UPDATE', 'PeopleSet', async(data) => {
+		const existingRecord = await SELECT.from(PeopleSet).where({PersonId : data.PersonId});
+		if (existingRecord.length > 0){
+			await DELETE.from(PeopleSet).where({PersonId : data.PersonId})
+		}
+	});
+
+	this.on('READ', 'PeopleSet.drafts', async(req, next) => {
+		let persisResults = await SELECT.from(PeopleSet);
+		let draftResults = await SELECT.from(PeopleSet.drafts);
+		let draftAdminResults = await SELECT.from('DRAFT.DraftAdministrativeData');
+		return next();
+	});
+
+    this.on('READ', PeopleSet, async (req, next) => {
+
+		let sBaseUrl = "/sap/opu/odata/sap/z_crud_tst_srv/People";
+		let oQuery = req.query.SELECT;
+		if (typeof(oQuery.from.ref[0]) == 'string' && !oQuery.where){
+			sBaseUrl += "?$inlinecount=allpages";
+		}
+		else if (typeof(oQuery.from.ref[0]) == 'object' && !oQuery.where){
+			sBaseUrl += ("('" + oQuery.from.ref[0].where[2].val + "')");
+		}
+		else if (typeof(oQuery.from.ref[0]) == 'string' && oQuery.where) {
+			sBaseUrl += ("('" + oQuery.where[2].val + "')");
 		}
 
-		return req;
-    }
+		let externalRes = await readDestination(sBaseUrl);
 
-    this.on('READ', 'People', async (req, next) => {
-        const sanitisedreq = RequestSanitizer(req); 
-        let results = await testservice.run(sanitisedreq);
-        console.log(results);
-        return next();
+		let bIsArray = Array.isArray(externalRes);
+		
+		if (bIsArray){
+			
+			externalRes = externalRes.map((x) => {
+				x.FullName = x.FirstName + " " + x.LastName;
+				x.StartDate = dateConverter(x.StartDate);
+				x.EndDate = dateConverter(x.EndDate);
+				x.StartDateDisp = x.StartDate.toISOString().substring(0,10);
+				x.EndDateDisp = x.EndDate.toISOString().substring(0, 10);
+				return x;
+			});
+
+			externalRes.$count = externalRes.length;
+		} else {
+			externalRes.FullName = externalRes.FirstName + " " + externalRes.LastName;
+			externalRes.StartDate = dateConverter(externalRes.StartDate);
+			externalRes.EndDate = dateConverter(externalRes.EndDate);
+			externalRes.StartDateDisp = externalRes.StartDate.toISOString().substring(0,10);
+			externalRes.EndDateDisp = externalRes.EndDate.toISOString().substring(0, 10);
+		}
+
+		return externalRes;
     });
 });

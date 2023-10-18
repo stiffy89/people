@@ -10,7 +10,7 @@
   },
   "scripts": {
     "watch-peopleapp": "cds watch --open peopleapp/webapp/index.html?sap-ui-xx-viewCache=false",
-    "backend": "cds watch --port 4001 --profile devdestination"
+    "devdestination": "cds watch --port 4001 --profile devdestination"
   },
   "cds": {
     "requires": {
@@ -21,7 +21,7 @@
             "csrfInBatch": true,
             "[devdestination]": {
                 "credentials": {
-                    "destination": "dest_ecc_people"
+                    "destination": "dest_ecc"
                 }
             }
         },
