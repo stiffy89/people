@@ -2,7 +2,7 @@ using {z_crud_tst_srv as external} from './external/z_crud_tst_srv.csn';
 
 service peopleservice {
 
-    entity PeopleSet {
+    entity People {
         key PersonId: String(3);
             FirstName: String(40);
             LastName: String(40);
@@ -12,5 +12,5 @@ service peopleservice {
             ImageBase64: String(1024);
     }
 
-    annotate PeopleSet with @odata.draft.enabled;
+    annotate People with @odata.draft.enabled;
 }

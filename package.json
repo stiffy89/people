@@ -9,7 +9,26 @@
     "@sap/ux-specification": "^1.108.16"
   },
   "scripts": {
-    "watch-peopleapp": "cds watch --open peopleapp/webapp/index.html?sap-ui-xx-viewCache=false"
+    "watch-peopleapp": "cds watch --open peopleapp/webapp/index.html?sap-ui-xx-viewCache=false",
+    "backend": "cds watch --port 4001 --profile devdestination"
+  },
+  "cds": {
+    "requires": {
+        "z_crud_tst_srv": {
+            "kind": "odata-v2",
+            "model": "srv/external/z_crud_tst_srv",
+            "csrf": true,
+            "csrfInBatch": true,
+            "[devdestination]": {
+                "credentials": {
+                    "destination": "dest_ecc_people"
+                }
+            }
+        },
+        "[production]": {
+            "auth": "xsuaa"
+        }
+    }
   },
   "sapux": [
     "app/peopleapp"
