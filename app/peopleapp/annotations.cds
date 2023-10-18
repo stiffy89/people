@@ -1,0 +1,1 @@
+using peopleservice as service from '../../srv/people-service';
