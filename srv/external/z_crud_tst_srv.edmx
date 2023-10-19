@@ -23,8 +23,8 @@
       </EntityContainer>
       <atom:link rel="self" href="https://dev.fire.nsw.gov.au:443/sap/opu/odata/SAP/Z_CRUD_TST_SRV/$metadata" 
         xmlns:atom="http://www.w3.org/2005/Atom"/>
-        <atom:link rel="latest-version" href="https://dev.fire.nsw.gov.au:443/sap/opu/odata/SAP/Z_CRUD_TST_SRV/$metadata" 
-          xmlns:atom="http://www.w3.org/2005/Atom"/>
-        </Schema>
-      </edmx:DataServices>
-    </edmx:Edmx>
+      <atom:link rel="latest-version" href="https://dev.fire.nsw.gov.au:443/sap/opu/odata/SAP/Z_CRUD_TST_SRV/$metadata" 
+        xmlns:atom="http://www.w3.org/2005/Atom"/>
+    </Schema>
+  </edmx:DataServices>
+</edmx:Edmx>

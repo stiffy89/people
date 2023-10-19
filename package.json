@@ -1,37 +1,88 @@
 {
-  "dependencies": {
-    "@sap-cloud-sdk/http-client": "^3.7.0",
-    "@sap/cds": "^7",
-    "express": "^4"
-  },
-  "devDependencies": {
-    "@cap-js/sqlite": "^1",
-    "@sap/cds-dk": "^7",
-    "@sap/ux-specification": "^1.108.16"
-  },
-  "scripts": {
-    "watch-peopleapp": "cds watch --open peopleapp/webapp/index.html?sap-ui-xx-viewCache=false",
-    "devdestination": "cds watch --port 4001 --profile devdestination"
-  },
-  "cds": {
-    "requires": {
-      "z_crud_tst_srv": {
-        "kind": "odata-v2",
-        "model": "srv/external/z_crud_tst_srv",
-        "csrf": true,
-        "csrfInBatch": true,
-        "[devdestination]": {
-          "credentials": {
-            "destination": "dest_ecc"
-          }
+    "name": "people",
+    "version": "1.0.1",
+    "description": "A simple CAP project.",
+    "repository": "<Add your repository here>",
+    "license": "UNLICENSED",
+    "private": true,
+    "dependencies": {
+        "@sap-cloud-sdk/http-client": "^3.6.0",
+        "@sap/cds": "^7",
+        "@sap/cds-hana": "^2",
+        "@sap/xssec": "^3",
+        "cf-nodejs-logging-support": "^6",
+        "express": "^4",
+        "passport": "^0",
+        "sap-cf-axios": "^0.4.10",
+        "sqlite3": "^5.0.2"
+    },
+    "devDependencies": {
+        "@cap-js/sqlite": "^1",
+        "@sap/cds-dk": "^7",
+        "@sap/ux-specification": "^1.108.16",
+        "rimraf": "^3.0.2"
+    },
+    "engines" : {
+        "node" : "^16"
+    },
+    "scripts": {
+        "start": "cds-serve",
+        "watch-peopleapp": "cds watch --open peopleapp/webapp/index.html?sap-ui-xx-viewCache=false",
+        "devdestination": "cds watch --port 4001 --profile devdestination",
+        "backend": "cds watch --port 4001 --profile backend",
+        "undeploy": "cf undeploy people --delete-services --delete-service-keys --delete-service-brokers",
+        "build": "rimraf resources mta_archives && mbt build --mtar archive",
+        "deploy": "cf deploy mta_archives/archive.mtar --retries 1"
+    },
+    "cds": {
+        "requires": {
+            "z_crud_tst_srv": {
+                "kind": "odata-v2",
+                "model": "srv/external/z_crud_tst_srv",
+                "csrf": true,
+                "csrfInBatch": true,
+                "[devdestination]": {
+                    "credentials": {
+                        "destination": "dest_ecc_crud_test"
+                    }
+                },
+                "[production]": {
+                    "credentials": {
+                        "destination": "dest_ecc_crud_test"
+                    }
+                }
+            },
+            "travel_exp": {
+                "kind": "odata-v2",
+                "model": "srv/external/travel_exp",
+                "csrf": true,
+                "csrfInBatch": true,
+                "[backend]": {
+                    "credentials": {
+                        "destination": "dest_ecc_travel_expenses"
+                    }
+                },
+                "[production]": {
+                    "credentials": {
+                        "destination": "dest_ecc_travel_expenses"
+                    }
+                }
+            },
+            "[production]": {
+                "auth": "xsuaa",
+                "db": {
+                    "kind": "sqlite",
+                    "credentials": {
+                        "database": ":memory:"
+                    }
+                }
+            }
+        },
+        "features": {
+            "in_memory_db": true
         }
-      },
-      "[production]": {
-        "auth": "xsuaa"
-      }
-    }
-  },
-  "sapux": [
-    "app/peopleapp"
-  ]
+    },
+    "sapux": [
+        "app/peopleapp"
+    ]
 }

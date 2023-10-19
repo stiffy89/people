@@ -3,6 +3,7 @@ const cds = require('@sap/cds');
 module.exports = cds.service.impl(async function () {
 
 	const testservice = await cds.connect.to('z_crud_tst_srv');
+	const travelexpservice = await cds.connect.to('travel_exp');
 
 	let { PeopleSet } = this.entities;
 
@@ -104,7 +105,14 @@ module.exports = cds.service.impl(async function () {
 
     this.on('READ', PeopleSet, async (req, next) => {
 
-		let sBaseUrl = "/sap/opu/odata/sap/z_crud_tst_srv/People";
+		let employeeResults = await travelexpservice.send({
+			method: 'GET',
+			path: "/Employees"
+		});
+		console.log(employeeResults);
+
+		let sBaseUrl = "/People";
+		//let sBaseUrl = "/sap/opu/odata/sap/z_crud_tst_srv/People";
 		let oQuery = req.query.SELECT;
 		if (typeof(oQuery.from.ref[0]) == 'string' && !oQuery.where){
 			sBaseUrl += "?$inlinecount=allpages";
@@ -119,7 +127,7 @@ module.exports = cds.service.impl(async function () {
 		let externalRes = await readDestination(sBaseUrl);
 
 		let bIsArray = Array.isArray(externalRes);
-		
+
 		if (bIsArray){
 			
 			externalRes = externalRes.map((x) => {
