@@ -11,6 +11,7 @@ modules:
   - name: people-uaa
   - name: people-destination
   - name: people-logging
+  - name: people-connectivity
   provides:
   - name: srv-api
     properties:
@@ -124,6 +125,12 @@ resources:
   type: org.cloudfoundry.managed-service
   parameters:
     service: application-logs
+    service-plan: lite
+
+- name: people-connectivity
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: connectivity
     service-plan: lite
     
 parameters:

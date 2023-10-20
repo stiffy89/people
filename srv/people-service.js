@@ -105,12 +105,6 @@ module.exports = cds.service.impl(async function () {
 
     this.on('READ', PeopleSet, async (req, next) => {
 
-		let employeeResults = await travelexpservice.send({
-			method: 'GET',
-			path: "/Employees"
-		});
-		console.log(employeeResults);
-
 		let sBaseUrl = "/People";
 		//let sBaseUrl = "/sap/opu/odata/sap/z_crud_tst_srv/People";
 		let oQuery = req.query.SELECT;
